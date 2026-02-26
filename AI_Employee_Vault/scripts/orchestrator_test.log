@@ -1,0 +1,20 @@
+AI Employee - Orchestrator (Bronze Tier)
+========================================
+Vault: ..
+Check Interval: 60 seconds
+
+Monitoring:
+  - /Needs_Action for new items
+  - /Approved for execution
+
+Press Ctrl+C to stop
+
+2026-02-27 01:07:59,157 - Orchestrator - INFO - Initialized Orchestrator
+2026-02-27 01:07:59,157 - Orchestrator - INFO - Vault: ..
+2026-02-27 01:07:59,157 - Orchestrator - INFO - Starting Orchestrator main loop
+2026-02-27 01:07:59,157 - Orchestrator - INFO - Check interval: 60s
+2026-02-27 01:07:59,161 - Orchestrator - INFO - Triggering Qwen Code for 3 item(s)
+2026-02-27 01:07:59,170 - Orchestrator - INFO - Created prompt file: current_prompt.md
+2026-02-27 01:08:02,709 - Orchestrator - INFO - Found Qwen Code using command: qwen
+2026-02-27 01:08:02,709 - Orchestrator - INFO - Qwen Code found, triggering processing...
+2026-02-27 01:08:02,731 - Orchestrator - INFO - Qwen Code processing started

@@ -1,0 +1,17 @@
+# AI Employee - Python Dependencies
+# Bronze Tier requirements
+
+# File system watching (for filesystem_watcher.py alternative using watchdog)
+watchdog>=3.0.0
+
+# For Gmail watcher (future tiers)
+# google-auth>=2.0.0
+# google-auth-oauthlib>=1.0.0
+# google-auth-httplib2>=0.1.0
+# google-api-python-client>=2.0.0
+
+# For WhatsApp watcher (future tiers - uses Playwright)
+# playwright>=1.40.0
+
+# General utilities
+requests>=2.31.0

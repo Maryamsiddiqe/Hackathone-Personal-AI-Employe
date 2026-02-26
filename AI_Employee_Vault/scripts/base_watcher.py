@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Base Watcher - Abstract template for all watcher scripts.
+
+Watchers monitor external inputs (Gmail, WhatsApp, filesystems) and create
+actionable .md files in the Needs_Action folder for Claude Code to process.
+"""
+
+import time
+import logging
+from pathlib import Path
+from abc import ABC, abstractmethod
+from datetime import datetime
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+
+class BaseWatcher(ABC):
+    """
+    Abstract base class for all watcher scripts.
+    
+    Subclasses must implement:
+    - check_for_updates(): Return list of new items to process
+    - create_action_file(item): Create .md file in Needs_Action folder
+    """
+    
+    def __init__(self, vault_path: str, check_interval: int = 60):
+        """
+        Initialize the watcher.
+        
+        Args:
+            vault_path: Path to the Obsidian vault root
+            check_interval: Seconds between checks (default: 60)
+        """
+        self.vault_path = Path(vault_path)
+        self.needs_action = self.vault_path / 'Needs_Action'
+        self.check_interval = check_interval
+        
+        # Ensure Needs_Action folder exists
+        self.needs_action.mkdir(parents=True, exist_ok=True)
+        
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info(f'Initialized {self.__class__.__name__}')
+        self.logger.info(f'Vault path: {self.vault_path}')
+        self.logger.info(f'Check interval: {check_interval}s')
+
+    @abstractmethod
+    def check_for_updates(self) -> list:
+        """
+        Check for new items that need processing.
+        
+        Returns:
+            list: List of new items to process
+        """
+        pass
+
+    @abstractmethod
+    def create_action_file(self, item) -> Path:
+        """
+        Create a markdown action file for an item.
+        
+        Args:
+            item: The item to create an action file for
+            
+        Returns:
+            Path: Path to the created file
+        """
+        pass
+
+    def run(self):
+        """
+        Main run loop - continuously checks for updates and creates action files.
+        """
+        self.logger.info(f'Starting {self.__class__.__name__} main loop')
+        
+        try:
+            while True:
+                try:
+                    items = self.check_for_updates()
+                    
+                    if items:
+                        self.logger.info(f'Found {len(items)} new item(s)')
+                        for item in items:
+                            try:
+                                filepath = self.create_action_file(item)
+                                self.logger.info(f'Created action file: {filepath.name}')
+                            except Exception as e:
+                                self.logger.error(f'Error creating action file: {e}')
+                    else:
+                        self.logger.debug('No new items')
+                        
+                except Exception as e:
+                    self.logger.error(f'Error in check cycle: {e}')
+                
+                time.sleep(self.check_interval)
+                
+        except KeyboardInterrupt:
+            self.logger.info(f'{self.__class__.__name__} stopped by user')
+        except Exception as e:
+            self.logger.error(f'Fatal error: {e}')
+            raise
+
+
+def get_timestamp() -> str:
+    """Get current timestamp in ISO format."""
+    return datetime.now().isoformat()
+
+
+def get_date_string() -> str:
+    """Get current date as YYYY-MM-DD."""
+    return datetime.now().strftime('%Y-%m-%d')
+
+
+if __name__ == '__main__':
+    print("BaseWatcher is an abstract class. Subclass it to create a specific watcher.")
+    print("\nExample subclasses:")
+    print("  - GmailWatcher: Monitor Gmail for new emails")
+    print("  - WhatsAppWatcher: Monitor WhatsApp for messages")
+    print("  - FilesystemWatcher: Monitor a folder for new files")
